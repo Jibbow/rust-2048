@@ -21,15 +21,17 @@ impl GameboardController {
     /// Handles events.
     pub fn event<E: GenericEvent>(&mut self, e: &E) {
         use piston::input::{Button, Key};
+        use gameboard::Direction;
 
         if let Some(Button::Keyboard(key)) = e.press_args() {
             match key {
-                Key::Left  => self.gameboard.move_left(),
-                Key::Right => self.gameboard.move_right(),
-                Key::Up    => self.gameboard.move_up(),
-                Key::Down  => self.gameboard.move_down(),
+                Key::Left  => self.gameboard.collapse(Direction::LEFT),
+                Key::Right => self.gameboard.collapse(Direction::RIGHT),
+                Key::Up    => self.gameboard.collapse(Direction::UP),
+                Key::Down  => self.gameboard.collapse(Direction::DOWN),
                 _ => {}
             }
+            self.gameboard.generate_tile();
         }
     }
 }
