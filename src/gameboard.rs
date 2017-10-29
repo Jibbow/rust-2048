@@ -34,6 +34,7 @@ impl Direction {
 
 
 impl Gameboard {
+
     /// Creates a new game board
     pub fn new() -> Gameboard {
         Gameboard {
@@ -41,15 +42,18 @@ impl Gameboard {
         }
     }
 
+    /// Gets a cell value
     fn get(&self, pos: &(usize,usize)) -> u16 {
         self.cells[pos.0][pos.1]
     }
 
-    /// Set cell value
+    /// Sets a cell value
     fn set(&mut self, pos: &(usize,usize), value: u16) {
             self.cells[pos.0][pos.1] = value;
     }
 
+    /// Returns an iterator which iterates through every tile in the correct order
+    /// depending on the moving direction of the tiles.
     fn iterate<'a>(dir: &Direction) -> Box<Iterator<Item=(usize,usize)> + 'a> {
         match dir {
             UP    => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, z%SIZE) )),
@@ -72,24 +76,27 @@ impl Gameboard {
         for pos in Gameboard::iterate(&dir) {
             let mut tmp_pos = pos.clone();
             while Gameboard::is_valid_pos(Gameboard::add(tmp_pos, dir.value())) {
+                // move cell
                 if self.get(&Gameboard::add(tmp_pos, dir.value())) == 0 {
-                    // move cell
                     let val = self.get(&tmp_pos);
                     self.set(&Gameboard::add(tmp_pos, dir.value()), val);
                     self.set(&tmp_pos, 0);
-                }
+                } 
+                // collapse two cells
                 if self.get(&Gameboard::add(tmp_pos, dir.value())) == self.get(&tmp_pos) {
                     let val = self.get(&tmp_pos) * 2;
                     self.set(&Gameboard::add(tmp_pos, dir.value()), val);
                     self.set(&tmp_pos, 0);
                     break;
                 }
-
                 tmp_pos = Gameboard::add(tmp_pos, dir.value())
             }
         }
     }
 
+    /// Randomly generates a new tile on a free field on the game board.
+    /// Returns true, if a tile has successfully been created, otherwise false.
+    /// A tile can not be created if there is no free space field left.
     pub fn generate_tile(&mut self) -> bool {
         use self::rand::Rng;
 
