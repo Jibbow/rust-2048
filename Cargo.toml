@@ -5,7 +5,7 @@ authors = ["Andreas Zimmerer <andreas.zimmerer@tum.de>"]
 
 [dependencies]
 piston = "*"
-pistoncore-glutin_window = "*"
+piston_window = "*"
 piston2d-graphics = "*"
 piston2d-opengl_graphics = "*"
 vecmath = "*"
