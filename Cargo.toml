@@ -1,0 +1,10 @@
+[package]
+name = "rust-2048"
+version = "0.1.0"
+authors = ["Andreas Zimmerer <andreas.zimmerer@tum.de>"]
+
+[dependencies]
+piston = "*"
+pistoncore-glutin_window = "*"
+piston2d-graphics = "*"
+piston2d-opengl_graphics = "*"
