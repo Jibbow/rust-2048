@@ -11,7 +11,6 @@ use piston::window::WindowSettings;
 use piston::event_loop::{Events, EventSettings, EventLoop};
 use piston::input::RenderEvent;
 use piston_window::*;
-use opengl_graphics::{OpenGL, GlGraphics};
 
 pub use gameboard::Gameboard;
 pub use gameboard_controller::GameboardController;
