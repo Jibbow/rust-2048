@@ -56,8 +56,8 @@ impl Gameboard {
     /// depending on the moving direction of the tiles.
     fn iterate(dir: &Direction) -> Box<Iterator<Item=(usize,usize)>> {
         match *dir {
-            Direction::UP    => {println!("UP");Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, z%SIZE) ))},
-            Direction::DOWN  => {println!("DOWN");Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, SIZE - z%SIZE - 1) ))},
+            Direction::UP    => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, z%SIZE) )),
+            Direction::DOWN  => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, SIZE - z%SIZE - 1) )),
             Direction::LEFT  => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, z/SIZE) )),
             Direction::RIGHT => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, SIZE - z/SIZE - 1) )),
         }
