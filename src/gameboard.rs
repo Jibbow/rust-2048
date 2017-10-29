@@ -54,12 +54,12 @@ impl Gameboard {
 
     /// Returns an iterator which iterates through every tile in the correct order
     /// depending on the moving direction of the tiles.
-    fn iterate<'a>(dir: &Direction) -> Box<Iterator<Item=(usize,usize)> + 'a> {
-        match dir {
-            UP    => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, z%SIZE) )),
-            DOWN  => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, SIZE - z%SIZE - 1) )),
-            LEFT  => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, z/SIZE) )),
-            RIGHT => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, SIZE - z/SIZE - 1) )),
+    fn iterate(dir: &Direction) -> Box<Iterator<Item=(usize,usize)>> {
+        match *dir {
+            Direction::UP    => {println!("UP");Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, z%SIZE) ))},
+            Direction::DOWN  => {println!("DOWN");Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, SIZE - z%SIZE - 1) ))},
+            Direction::LEFT  => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, z/SIZE) )),
+            Direction::RIGHT => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, SIZE - z/SIZE - 1) )),
         }
     }
 
@@ -73,7 +73,9 @@ impl Gameboard {
     }
 
     pub fn collapse(&mut self, dir: Direction) {
+        println!("");
         for pos in Gameboard::iterate(&dir) {
+            println!("{:?}", pos);
             let mut tmp_pos = pos.clone();
             while Gameboard::is_valid_pos(Gameboard::add(tmp_pos, dir.value())) {
                 // move cell
