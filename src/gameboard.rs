@@ -59,7 +59,7 @@ impl Gameboard {
             Direction::UP    => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, z%SIZE) )),
             Direction::DOWN  => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, SIZE - z%SIZE - 1) )),
             Direction::LEFT  => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, z/SIZE) )),
-            Direction::RIGHT => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, SIZE - z/SIZE - 1) )),
+            Direction::RIGHT => Box::new((0..SIZE*SIZE).map(|z| (SIZE - z%SIZE - 1, z/SIZE) )),
         }
     }
 
@@ -73,9 +73,11 @@ impl Gameboard {
     }
 
     pub fn collapse(&mut self, dir: Direction) {
-        println!("");
         for pos in Gameboard::iterate(&dir) {
-            println!("{:?}", pos);
+            // skip if cell is empty
+            if self.get(&pos) == 0 {
+                continue;
+            }
             let mut tmp_pos = pos.clone();
             while Gameboard::is_valid_pos(Gameboard::add(tmp_pos, dir.value())) {
                 // move cell

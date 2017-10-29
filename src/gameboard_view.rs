@@ -74,7 +74,8 @@ impl GameboardView {
 
     /// Draw gameboard.
     pub fn draw<G: Graphics>(&self, controller: &GameboardController, c: &Context, g: &mut G) {
-        use graphics::{Line, Rectangle};
+
+        use graphics::{Rectangle};
         
         let ref settings = self.settings;
         let board_rect = [
@@ -98,6 +99,10 @@ impl GameboardView {
 
                 Rectangle::new(GameboardView::map_color(controller.gameboard.cells[x][y]))
                     .draw(cell_rect, &c.draw_state, c.transform, g);
+
+                // draw text
+                //let text = Image::new_color([1.0, 1.0, 1.0, 1.0])
+                //    .draw(&glyphs.character(34, 'a').texture, &c.draw_state, c.transform, g);
             }
         }
         
