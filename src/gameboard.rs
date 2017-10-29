@@ -53,9 +53,9 @@ impl Gameboard {
     fn iterate<'a>(dir: &Direction) -> Box<Iterator<Item=(usize,usize)> + 'a> {
         match dir {
             UP    => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, z%SIZE) )),
-            DOWN  => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, SIZE - z%SIZE) )),
+            DOWN  => Box::new((0..SIZE*SIZE).map(|z| (z/SIZE, SIZE - z%SIZE - 1) )),
             LEFT  => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, z/SIZE) )),
-            RIGHT => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, SIZE - z/SIZE) )),
+            RIGHT => Box::new((0..SIZE*SIZE).map(|z| (z%SIZE, SIZE - z/SIZE - 1) )),
         }
     }
 
@@ -78,12 +78,19 @@ impl Gameboard {
                     self.set(&Gameboard::add(tmp_pos, dir.value()), val);
                     self.set(&tmp_pos, 0);
                 }
+                if self.get(&Gameboard::add(tmp_pos, dir.value())) == self.get(&tmp_pos) {
+                    let val = self.get(&tmp_pos) * 2;
+                    self.set(&Gameboard::add(tmp_pos, dir.value()), val);
+                    self.set(&tmp_pos, 0);
+                    break;
+                }
+
                 tmp_pos = Gameboard::add(tmp_pos, dir.value())
             }
         }
     }
 
-    pub fn generate_tile(&mut self) {
+    pub fn generate_tile(&mut self) -> bool {
         use self::rand::Rng;
 
         let free: Vec<(usize,usize)> = Gameboard::iterate(&Direction::UP).filter(|x| self.get(x) == 0).collect();
@@ -91,7 +98,9 @@ impl Gameboard {
             let i = rand::thread_rng().gen_range(0, free.len());
             
             self.cells[free[i].0][free[i].1] = 2;
+            return true
         }
+        false
     }
 }
 
