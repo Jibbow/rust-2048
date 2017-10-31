@@ -58,6 +58,10 @@ impl GameboardView {
         }
     }
 
+    /// Mapping between tile score and colors.
+    /// The returned tuple contains two colors:
+    ///  - the first one is the background color for the tile
+    ///  - the second one is the font color fot the tile
     fn map_color(value: u16) -> (Color, Color) {
         match value {
             0    => (hex("CCC0B3FF"),hex("00000000")),
