@@ -1,8 +1,6 @@
 //! Gameboard view.
 
 extern crate piston_window;
-use std::fmt;
-use std::path::Path;
 
 use piston_window::*;
 use graphics::types::Color;
@@ -98,27 +96,23 @@ impl GameboardView {
         let gameboardsize = controller.gameboard.cells.len();
         for x in 0..gameboardsize {
             for y in 0..gameboardsize {
-                let cell_rect = [
-                    x as f64 * settings.size / gameboardsize as f64 + 2.0,
-                    y as f64 * settings.size / gameboardsize as f64 + 2.0,
-                    settings.size / gameboardsize as f64 - 4.0,
-                    settings.size / gameboardsize as f64 - 4.0,
-                ];
-
-                Rectangle::new(GameboardView::map_color(controller.gameboard.cells[x][y]))
-                    .draw(cell_rect, &c.draw_state, c.transform, g);
-
-                // draw text
-               // let mut glyphs = Glyphs::new(font_file, factory, TextureSettings::new()).unwrap();
-                text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
-                    "Hello world!",
-                    glyphs,
-                    &c.draw_state,
-                    c.transform, g
-                ).unwrap();
-
-                //let text = Image::new_color([1.0, 1.0, 1.0, 1.0])
-                //    .draw(&glyphs.character(34, 'a').texture, &c.draw_state, c.transform, g);
+                if controller.gameboard.cells[x][y] != 0 {
+                    let size = settings.size / gameboardsize as f64 - 4.0;
+                    let pos_x = x as f64 * settings.size / gameboardsize as f64 + 2.0;
+                    let pos_y = y as f64 * settings.size / gameboardsize as f64 + 2.0;
+    
+                    Rectangle::new(GameboardView::map_color(controller.gameboard.cells[x][y]))
+                        .draw(rectangle::square(0.0, 0.0, size), &c.draw_state, c.transform.trans(pos_x, pos_y), g);
+    
+                    // draw text
+                    text::Text::new_color([1.0, 1.0, 1.0, 1.0], 32).draw(
+                        &controller.gameboard.cells[x][y].to_string(),
+                        glyphs,
+                        &c.draw_state,
+                        c.transform.trans(pos_x + 10.0, pos_y + 30.0), 
+                        g
+                    ).unwrap();
+                }
             }
         }
         
