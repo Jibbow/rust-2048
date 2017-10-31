@@ -7,6 +7,7 @@ use graphics::types::Color;
 use graphics::{Context, Graphics};
 use graphics::character::CharacterCache;
 use graphics::glyph_cache::rusttype::*;
+use graphics::color::hex;
 
 use GameboardController;
 
@@ -34,7 +35,7 @@ impl GameboardViewSettings {
         GameboardViewSettings {
             position: [0.0; 2],
             size: 400.0,
-            board_background_color: [0.8, 0.8, 1.0, 1.0],
+            board_background_color: hex("BBADA0"),
             board_edge_color: [0.0, 0.0, 0.2, 1.0],
             board_edge_radius: 3.0,
             cell_edge_color: [0.0, 0.0, 0.2, 1.0],
@@ -57,23 +58,22 @@ impl GameboardView {
         }
     }
 
-    fn map_color(value: u16) -> Color {
-        use graphics::color::hex;
+    fn map_color(value: u16) -> (Color, Color) {
         match value {
-            0    => hex("00000000"),
-            1    => hex("00000000"),
-            2    => hex("005000FF"),
-            4    => hex("55B900FF"),
-            8    => hex("AADC00FF"),
-            16   => hex("FFFF00FF"),
-            32   => hex("FFAA00FF"),
-            64   => hex("FF5500FF"),
-            128  => hex("FF0000FF"),
-            256  => hex("DC0032FF"),
-            512  => hex("B90064FF"),
-            1024 => hex("960096FF"),
-            2048 => hex("000000FF"),
-            _    => hex("00000000"),
+            0    => (hex("CCC0B3FF"),hex("00000000")),
+            1    => (hex("00000000"),hex("00000000")),
+            2    => (hex("EEE4DAFF"),hex("776E65FF")),
+            4    => (hex("EDE0C8FF"),hex("776E65FF")),
+            8    => (hex("F2B179FF"),hex("F9F6F2FF")),
+            16   => (hex("F59563FF"),hex("F9F6F2FF")),
+            32   => (hex("F67C5FFF"),hex("F9F6F2FF")),
+            64   => (hex("FF5500FF"),hex("F9F6F2FF")),
+            128  => (hex("EDCF72FF"),hex("F9F6F2FF")),
+            256  => (hex("EDCC61FF"),hex("F9F6F2FF")),
+            512  => (hex("EDC850FF"),hex("F9F6F2FF")),
+            1024 => (hex("EDC53FFF"),hex("F9F6F2FF")),
+            2048 => (hex("EDC22EFF"),hex("F9F6F2FF")),
+            _    => (hex("3E3933FF"),hex("F9F6F2FF")),
         }
     }
 
@@ -96,23 +96,21 @@ impl GameboardView {
         let gameboardsize = controller.gameboard.cells.len();
         for x in 0..gameboardsize {
             for y in 0..gameboardsize {
-                if controller.gameboard.cells[x][y] != 0 {
-                    let size = settings.size / gameboardsize as f64 - 4.0;
-                    let pos_x = x as f64 * settings.size / gameboardsize as f64 + 2.0;
-                    let pos_y = y as f64 * settings.size / gameboardsize as f64 + 2.0;
+                let size = settings.size / gameboardsize as f64 - 8.0;
+                let pos_x = x as f64 * settings.size / gameboardsize as f64 + 4.0;
+                let pos_y = y as f64 * settings.size / gameboardsize as f64 + 4.0;
     
-                    Rectangle::new(GameboardView::map_color(controller.gameboard.cells[x][y]))
-                        .draw(rectangle::square(0.0, 0.0, size), &c.draw_state, c.transform.trans(pos_x, pos_y), g);
+                Rectangle::new(GameboardView::map_color(controller.gameboard.cells[x][y]).0)
+                    .draw(rectangle::square(0.0, 0.0, size), &c.draw_state, c.transform.trans(pos_x, pos_y), g);
     
-                    // draw text
-                    text::Text::new_color([1.0, 1.0, 1.0, 1.0], 32).draw(
-                        &controller.gameboard.cells[x][y].to_string(),
-                        glyphs,
-                        &c.draw_state,
-                        c.transform.trans(pos_x + 10.0, pos_y + 30.0), 
-                        g
-                    ).unwrap();
-                }
+                // draw text
+                text::Text::new_color(GameboardView::map_color(controller.gameboard.cells[x][y]).1, 32).draw(
+                    &controller.gameboard.cells[x][y].to_string(),
+                    glyphs,
+                    &c.draw_state,
+                    c.transform.trans(pos_x + 10.0, pos_y + 30.0), 
+                    g
+                ).unwrap();
             }
         }
         
