@@ -9,7 +9,7 @@ extern crate opengl_graphics;
 extern crate find_folder;
 
 use piston::window::WindowSettings;
-use piston::event_loop::{Events, EventSettings, EventLoop};
+use piston::event_loop::{EventLoop};
 use piston::input::RenderEvent;
 use piston_window::*;
 

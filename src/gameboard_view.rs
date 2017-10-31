@@ -6,7 +6,6 @@ use piston_window::*;
 use graphics::types::Color;
 use graphics::{Context, Graphics};
 use graphics::character::CharacterCache;
-use graphics::glyph_cache::rusttype::*;
 use graphics::color::hex;
 
 use GameboardController;
