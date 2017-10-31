@@ -6,6 +6,7 @@ extern crate piston;
 extern crate piston_window;
 extern crate graphics;
 extern crate opengl_graphics;
+extern crate find_folder;
 
 use piston::window::WindowSettings;
 use piston::event_loop::{Events, EventSettings, EventLoop};
@@ -25,22 +26,25 @@ fn main() {
         .build()
         .expect("Could not create window");
 
-    let mut events = Events::new(EventSettings::new().lazy(true));
-    //let mut gl = GlGraphics::new(opengl);
+    let assets = find_folder::Search::ParentsThenKids(3, 3)
+        .for_folder("assets").unwrap();
+    let ref font = assets.join("FiraSans-Regular.ttf");
+    let factory = window.factory.clone();
+    let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
 
     let gameboard = Gameboard::new();
     let mut gameboard_controller = GameboardController::new(gameboard);
     let gameboard_view_settings = GameboardViewSettings::new();
     let gameboard_view = GameboardView::new(gameboard_view_settings);
 
-    while let Some(e) = events.next(&mut window) {
+    window.set_lazy(true);
+    while let Some(e) = window.next() {
         gameboard_controller.event(&e);
         if let Some(args) = e.render_args() {
             window.draw_2d(&e, |c, g| {
-                use graphics::{clear};
+                clear([0.0; 4], g);
 
-                clear([1.0; 4], g);
-                gameboard_view.draw(&gameboard_controller, &c, g);
+                gameboard_view.draw(&gameboard_controller, font, factory, &c, g);
             });
         }
     }

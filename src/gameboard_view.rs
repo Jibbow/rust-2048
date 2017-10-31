@@ -1,7 +1,14 @@
 //! Gameboard view.
 
+use std::fmt;
+use std::path::Path;
+
+use piston_window::*;
 use graphics::types::Color;
 use graphics::{Context, Graphics};
+use graphics::character::CharacterCache;
+use graphics::glyph_cache::rusttype::*;
+use piston_window::gfx_graphics::Graphics;
 
 use GameboardController;
 
@@ -73,7 +80,8 @@ impl GameboardView {
     }
 
     /// Draw gameboard.
-    pub fn draw<G: Graphics>(&self, controller: &GameboardController, c: &Context, g: &mut G) {
+    pub fn draw(&self, controller: &GameboardController, font_file: &Path, factory: GfxFactory, c: &Context, g: &mut GfxGraphics)
+    {//where C: GlyphCache<Texture = G::Texture> {//where C: GlyphCache<Texture = G::Texture> {
 
         use graphics::{Rectangle};
         
@@ -101,6 +109,14 @@ impl GameboardView {
                     .draw(cell_rect, &c.draw_state, c.transform, g);
 
                 // draw text
+                let mut glyphs = Glyphs::new(font_file, factory, TextureSettings::new()).unwrap();
+                text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
+                    "Hello world!",
+                    &mut glyphs,
+                    &c.draw_state,
+                    c.transform, g
+                ).unwrap();
+
                 //let text = Image::new_color([1.0, 1.0, 1.0, 1.0])
                 //    .draw(&glyphs.character(34, 'a').texture, &c.draw_state, c.transform, g);
             }
