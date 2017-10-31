@@ -72,34 +72,57 @@ impl Gameboard {
         (((first.0 as isize) + second.0) as usize, ((first.1 as isize) + second.1) as usize)
     }
 
+    /// Processes all tiles on the game board and moves them around or collapses them.
     pub fn collapse(&mut self, dir: Direction) -> bool {
+        // will be set, if a valid move has been made in this turn
         let mut was_valid_move = false;
+
+        // holds a blocking position which can not be passed by other tiles.
+        // Reason: when two tiles have been collapsed no subsequent collapsed
+        //         should be done with this tile.
+        //         Because all tiles are processed in a special order, it is 
+        //         enough to just have one blocking field that gets updated
+        //         when two tiles are collapsed.
         let mut blocker = (<usize>::max_value(),usize::max_value());
+
+        // processes all tiles: moves them and collapses them
         for pos in Gameboard::iterate(&dir) {
             // skip if cell is empty
             if self.get(&pos) == 0 {
                 continue;
             }
-            let mut tmp_pos = pos.clone();
-            while Gameboard::is_valid_pos(Gameboard::add(tmp_pos, dir.value()))
-                && Gameboard::add(tmp_pos, dir.value()) != blocker {
-                // move cell
-                if self.get(&Gameboard::add(tmp_pos, dir.value())) == 0 {
-                    let val = self.get(&tmp_pos);
-                    self.set(&Gameboard::add(tmp_pos, dir.value()), val);
-                    self.set(&tmp_pos, 0);
+
+            // current position of the processed tile
+            let mut source_pos = pos.clone();
+            // cell where the current tile should move to
+            let mut target_pos = Gameboard::add(source_pos, dir.value());
+
+            // move the current tile
+            while Gameboard::is_valid_pos(target_pos) && target_pos != blocker {
+                // if there is no other tile -> move
+                if self.get(&target_pos) == 0 {
+                    let target_value = self.get(&source_pos);
+                    self.set(&target_pos, target_value);
+                    self.set(&source_pos, 0);
+
                     was_valid_move = true;
-                } 
-                // collapse two cells
-                if self.get(&Gameboard::add(tmp_pos, dir.value())) == self.get(&tmp_pos) {
-                    let val = self.get(&tmp_pos) * 2;
-                    self.set(&Gameboard::add(tmp_pos, dir.value()), val);
-                    self.set(&tmp_pos, 0);
-                    blocker = Gameboard::add(tmp_pos, dir.value()).clone();
-                    was_valid_move = true;
+                } else { // there is another tile in the way!
+                    // if the other tile has the same value -> collapse
+                    if self.get(&target_pos) == self.get(&source_pos) {
+                        // double the value of the collapsed cell
+                        let target_value = self.get(&target_pos) * 2;
+                        self.set(&target_pos, target_value);
+                        self.set(&source_pos, 0);
+                        // update the blocker position -> no collapses with this cell are allowed
+                        blocker = target_pos.clone();
+
+                        was_valid_move = true;
+                    }
                     break;
                 }
-                tmp_pos = Gameboard::add(tmp_pos, dir.value())
+                // update positions after move
+                source_pos = target_pos;
+                target_pos = Gameboard::add(source_pos, dir.value())
             }
         }
         was_valid_move
