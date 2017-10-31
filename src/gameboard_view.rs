@@ -1,5 +1,6 @@
 //! Gameboard view.
 
+extern crate piston_window;
 use std::fmt;
 use std::path::Path;
 
@@ -8,7 +9,6 @@ use graphics::types::Color;
 use graphics::{Context, Graphics};
 use graphics::character::CharacterCache;
 use graphics::glyph_cache::rusttype::*;
-use piston_window::gfx_graphics::Graphics;
 
 use GameboardController;
 
@@ -64,7 +64,7 @@ impl GameboardView {
         match value {
             0    => hex("00000000"),
             1    => hex("00000000"),
-            2    => hex("009600FF"),
+            2    => hex("005000FF"),
             4    => hex("55B900FF"),
             8    => hex("AADC00FF"),
             16   => hex("FFFF00FF"),
@@ -80,8 +80,8 @@ impl GameboardView {
     }
 
     /// Draw gameboard.
-    pub fn draw(&self, controller: &GameboardController, font_file: &Path, factory: GfxFactory, c: &Context, g: &mut GfxGraphics)
-    {//where C: GlyphCache<Texture = G::Texture> {//where C: GlyphCache<Texture = G::Texture> {
+    pub fn draw<G>(&self, controller: &GameboardController, glyphs: &mut Glyphs, c: &Context, g: &mut G)
+        where G: Graphics<Texture=<Glyphs as CharacterCache>::Texture> {
 
         use graphics::{Rectangle};
         
@@ -109,10 +109,10 @@ impl GameboardView {
                     .draw(cell_rect, &c.draw_state, c.transform, g);
 
                 // draw text
-                let mut glyphs = Glyphs::new(font_file, factory, TextureSettings::new()).unwrap();
+               // let mut glyphs = Glyphs::new(font_file, factory, TextureSettings::new()).unwrap();
                 text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
                     "Hello world!",
-                    &mut glyphs,
+                    glyphs,
                     &c.draw_state,
                     c.transform, g
                 ).unwrap();

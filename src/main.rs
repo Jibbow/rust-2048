@@ -44,7 +44,7 @@ fn main() {
             window.draw_2d(&e, |c, g| {
                 clear([0.0; 4], g);
 
-                gameboard_view.draw(&gameboard_controller, font, factory, &c, g);
+                gameboard_view.draw(&gameboard_controller, &mut glyphs, &c, g);
             });
         }
     }
