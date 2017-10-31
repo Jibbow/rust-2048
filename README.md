@@ -3,7 +3,7 @@
 
 This is a clone of the popular "2048" game written in Rust using the [Piston][1] game engine.
 
-
+![screenshot](./2048.png)
 
 
 ---------
