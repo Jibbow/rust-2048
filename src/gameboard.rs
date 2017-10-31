@@ -74,13 +74,15 @@ impl Gameboard {
 
     pub fn collapse(&mut self, dir: Direction) -> bool {
         let mut was_valid_move = false;
+        let mut blocker = (<usize>::max_value(),usize::max_value());
         for pos in Gameboard::iterate(&dir) {
             // skip if cell is empty
             if self.get(&pos) == 0 {
                 continue;
             }
             let mut tmp_pos = pos.clone();
-            while Gameboard::is_valid_pos(Gameboard::add(tmp_pos, dir.value())) {
+            while Gameboard::is_valid_pos(Gameboard::add(tmp_pos, dir.value()))
+                && Gameboard::add(tmp_pos, dir.value()) != blocker {
                 // move cell
                 if self.get(&Gameboard::add(tmp_pos, dir.value())) == 0 {
                     let val = self.get(&tmp_pos);
@@ -93,6 +95,7 @@ impl Gameboard {
                     let val = self.get(&tmp_pos) * 2;
                     self.set(&Gameboard::add(tmp_pos, dir.value()), val);
                     self.set(&tmp_pos, 0);
+                    blocker = Gameboard::add(tmp_pos, dir.value()).clone();
                     was_valid_move = true;
                     break;
                 }
