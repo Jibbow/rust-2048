@@ -13,9 +13,11 @@ pub struct GameboardController {
 impl GameboardController {
     /// Creates a new gameboard controller.
     pub fn new(gameboard: Gameboard) -> GameboardController {
-        GameboardController {
+        let mut gb = GameboardController {
             gameboard: gameboard,
-        }
+        };
+        gb.gameboard.generate_tile();
+        gb
     }
 
     /// Handles events.
@@ -24,14 +26,16 @@ impl GameboardController {
         use gameboard::Direction;
 
         if let Some(Button::Keyboard(key)) = e.press_args() {
-            match key {
+            let was_valid_move = match key {
                 Key::Left  => self.gameboard.collapse(Direction::LEFT),
                 Key::Right => self.gameboard.collapse(Direction::RIGHT),
                 Key::Up    => self.gameboard.collapse(Direction::UP),
                 Key::Down  => self.gameboard.collapse(Direction::DOWN),
-                _ => {}
+                _ => false,
+            };
+            if was_valid_move {
+                self.gameboard.generate_tile();
             }
-            self.gameboard.generate_tile();
         }
     }
 }

@@ -72,7 +72,8 @@ impl Gameboard {
         (((first.0 as isize) + second.0) as usize, ((first.1 as isize) + second.1) as usize)
     }
 
-    pub fn collapse(&mut self, dir: Direction) {
+    pub fn collapse(&mut self, dir: Direction) -> bool {
+        let mut was_valid_move = false;
         for pos in Gameboard::iterate(&dir) {
             // skip if cell is empty
             if self.get(&pos) == 0 {
@@ -85,17 +86,20 @@ impl Gameboard {
                     let val = self.get(&tmp_pos);
                     self.set(&Gameboard::add(tmp_pos, dir.value()), val);
                     self.set(&tmp_pos, 0);
+                    was_valid_move = true;
                 } 
                 // collapse two cells
                 if self.get(&Gameboard::add(tmp_pos, dir.value())) == self.get(&tmp_pos) {
                     let val = self.get(&tmp_pos) * 2;
                     self.set(&Gameboard::add(tmp_pos, dir.value()), val);
                     self.set(&tmp_pos, 0);
+                    was_valid_move = true;
                     break;
                 }
                 tmp_pos = Gameboard::add(tmp_pos, dir.value())
             }
         }
+        was_valid_move
     }
 
     /// Randomly generates a new tile on a free field on the game board.
