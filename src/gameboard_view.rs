@@ -100,7 +100,7 @@ impl GameboardView {
                 let pos_x = x as f64 * settings.size / gameboardsize as f64 + 4.0;
                 let pos_y = y as f64 * settings.size / gameboardsize as f64 + 4.0;
     
-                Rectangle::new(GameboardView::map_color(controller.gameboard.cells[x][y]).0)
+                Rectangle::new_round(GameboardView::map_color(controller.gameboard.cells[x][y]).0, 5.0)
                     .draw(rectangle::square(0.0, 0.0, size), &c.draw_state, c.transform.trans(pos_x, pos_y), g);
     
                 // draw text
