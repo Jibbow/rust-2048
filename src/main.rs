@@ -21,8 +21,9 @@ mod gameboard_controller;
 mod gameboard_view;
 
 fn main() {
-    let mut window: PistonWindow = WindowSettings::new("2048", (512,512))
+    let mut window: PistonWindow = WindowSettings::new("2048", (400,400))
         .exit_on_esc(true)
+        .resizable(false)
         .build()
         .expect("Could not create window");
 
