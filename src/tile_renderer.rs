@@ -1,10 +1,11 @@
+//! TileRenderer for rendering single tiles on the screen.
 
+use piston_window::*;
 use graphics::color::hex;
 use graphics::{Context, Graphics};
 use graphics::types::Color;
-use piston_window::*;
-use std::path::Path;
 use graphics::character::CharacterCache;
+use std::path::Path;
 use std::cell::RefCell;
 use std::ops::DerefMut;
 
@@ -31,8 +32,11 @@ fn map_color(value: u16) -> (Color, Color) {
     }
 }
 
+/// [Builder Pattern]
+/// Builds a new TileRenderer based on the given settings.
 pub struct TileSettings {
     size: f64,
+    // glyph cache
     glyphs: Option<RefCell<Glyphs>>,
     color_mapping: fn(u16) -> (Color, Color),
 }
@@ -46,21 +50,27 @@ impl TileSettings {
         }
     }
 
+    /// Sets the glyph cache for the TileRenderer based on an existing cache.
+    /// Moves the reference to this TileRenderer.
     pub fn with_glyphs(mut self, glyphs: Glyphs) -> TileSettings {
         self.glyphs = Some(RefCell::new(glyphs));
         self
     }
 
+    /// Sets the glyph cache for the TileRenderer based on an existing cache.
+    /// Allows a shared cache between multiple renderers.
     pub fn with_ref_glyphs(mut self, glyphs: RefCell<Glyphs>) -> TileSettings {
         self.glyphs = Some(glyphs);
         self
     }
 
+    /// Creates a new glyph cache based on a given font file.
     pub fn with_font(mut self, path: &Path, factory: GfxFactory) -> TileSettings {
         self.glyphs = Some(RefCell::new(Glyphs::new(path, factory, TextureSettings::new()).unwrap()));
         self
     }
 
+    /// Constructs a TileRenderer based on the given settings.
     pub fn build(self) -> TileRenderer {
         TileRenderer {
             size: self.size,
@@ -71,10 +81,13 @@ impl TileSettings {
 }
 
 
-
+/// Actual tile renderer
 pub struct TileRenderer {
+    // size of a single tile
     size: f64,
+    // glyph cache for font
     glyphs: RefCell<Glyphs>,
+    // function that determines the drawn colors
     color_mapping: fn(u16) -> (Color, Color),
 }
 
