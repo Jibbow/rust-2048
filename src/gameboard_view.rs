@@ -9,6 +9,8 @@ use graphics::character::CharacterCache;
 use graphics::color::hex;
 
 use GameboardController;
+use TileRenderer;
+use TileSettings;
 
 /// Stores gameboard view settings.
 pub struct GameboardViewSettings {
@@ -47,42 +49,21 @@ impl GameboardViewSettings {
 pub struct GameboardView {
     /// Stores gameboard view settings.
     pub settings: GameboardViewSettings,
+    tile_renderer: TileRenderer,
 }
 
 impl GameboardView {
     /// Creates a new gameboard view.
-    pub fn new(settings: GameboardViewSettings) -> GameboardView {
+    pub fn new(settings: GameboardViewSettings, glyphs: Glyphs) -> GameboardView {
         GameboardView {
             settings: settings,
-        }
-    }
-
-    /// Mapping between tile score and colors.
-    /// The returned tuple contains two colors:
-    ///  - the first one is the background color for the tile
-    ///  - the second one is the font color fot the tile
-    fn map_color(value: u16) -> (Color, Color) {
-        match value {
-            0    => (hex("CCC0B3FF"),hex("00000000")),
-            1    => (hex("00000000"),hex("00000000")),
-            2    => (hex("EEE4DAFF"),hex("776E65FF")),
-            4    => (hex("EDE0C8FF"),hex("776E65FF")),
-            8    => (hex("F2B179FF"),hex("F9F6F2FF")),
-            16   => (hex("F59563FF"),hex("F9F6F2FF")),
-            32   => (hex("F67C5FFF"),hex("F9F6F2FF")),
-            64   => (hex("FF5500FF"),hex("F9F6F2FF")),
-            128  => (hex("EDCF72FF"),hex("F9F6F2FF")),
-            256  => (hex("EDCC61FF"),hex("F9F6F2FF")),
-            512  => (hex("EDC850FF"),hex("F9F6F2FF")),
-            1024 => (hex("EDC53FFF"),hex("F9F6F2FF")),
-            2048 => (hex("EDC22EFF"),hex("F9F6F2FF")),
-            _    => (hex("3E3933FF"),hex("F9F6F2FF")),
+            tile_renderer: TileSettings::new(80.0).with_glyphs(glyphs).build(),
         }
     }
 
     /// Draw gameboard.
-    pub fn draw<G>(&self, controller: &GameboardController, glyphs: &mut Glyphs, c: &Context, g: &mut G)
-        where G: Graphics<Texture=<Glyphs as CharacterCache>::Texture> {
+    pub fn draw<G>(&self, controller: &GameboardController, c: &Context, g: &mut G) 
+        where G: Graphics<Texture=<Glyphs as CharacterCache>::Texture>{
 
         use graphics::{Rectangle};
         
@@ -102,18 +83,8 @@ impl GameboardView {
                 let size = settings.size / gameboardsize as f64 - 8.0;
                 let pos_x = x as f64 * settings.size / gameboardsize as f64 + 4.0;
                 let pos_y = y as f64 * settings.size / gameboardsize as f64 + 4.0;
-    
-                Rectangle::new_round(GameboardView::map_color(controller.gameboard.cells[x][y]).0, 5.0)
-                    .draw(rectangle::square(0.0, 0.0, size), &c.draw_state, c.transform.trans(pos_x, pos_y), g);
-    
-                // draw text
-                text::Text::new_color(GameboardView::map_color(controller.gameboard.cells[x][y]).1, 32).draw(
-                    &controller.gameboard.cells[x][y].to_string(),
-                    glyphs,
-                    &c.draw_state,
-                    c.transform.trans(pos_x + 10.0, pos_y + 30.0), 
-                    g
-                ).unwrap();
+
+                self.tile_renderer.draw_tile(controller.gameboard.cells[x][y], &c.trans(pos_x, pos_y), g);
             }
         }
         

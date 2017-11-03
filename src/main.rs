@@ -16,9 +16,11 @@ use piston_window::*;
 pub use gameboard::Gameboard;
 pub use gameboard_controller::GameboardController;
 pub use gameboard_view::{GameboardView, GameboardViewSettings};
+pub use tile_renderer::{TileSettings, TileRenderer};
 mod gameboard;
 mod gameboard_controller;
 mod gameboard_view;
+mod tile_renderer;
 
 fn main() {
     let mut window: PistonWindow = WindowSettings::new("2048", (400,400))
@@ -31,12 +33,12 @@ fn main() {
         .for_folder("assets").unwrap();
     let ref font = assets.join("FiraSans-Regular.ttf");
     let factory = window.factory.clone();
-    let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
+    let glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
 
     let gameboard = Gameboard::new();
     let mut gameboard_controller = GameboardController::new(gameboard);
     let gameboard_view_settings = GameboardViewSettings::new();
-    let gameboard_view = GameboardView::new(gameboard_view_settings);
+    let gameboard_view = GameboardView::new(gameboard_view_settings, glyphs);
 
     window.set_lazy(true);
     while let Some(e) = window.next() {
@@ -45,7 +47,7 @@ fn main() {
             window.draw_2d(&e, |c, g| {
                 clear([0.0; 4], g);
 
-                gameboard_view.draw(&gameboard_controller, &mut glyphs, &c, g);
+                gameboard_view.draw(&gameboard_controller, &c, g);
             });
         }
     }
