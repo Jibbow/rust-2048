@@ -9,10 +9,14 @@ use std::path::Path;
 use std::cell::RefCell;
 use std::ops::DerefMut;
 
+
 /// Mapping between tile score and colors.
 /// The returned tuple contains two colors:
 ///  - the first one is the background color for the tile
 ///  - the second one is the font color fot the tile
+///
+///  * `value`: Value of the tile. Different values result in
+///             different colors.
 fn map_color(value: u16) -> (Color, Color) {
     match value {
         0    => (hex("CCC0B3FF"),hex("00000000")),
@@ -42,6 +46,11 @@ pub struct TileSettings {
 }
 
 impl TileSettings {
+
+    /// Creates a new instance of `TileSettings`.
+    /// Use the `build()` method to create a new `TileRenderer` from these settings.
+    ///
+    /// * `size`: Size of a rendered tile (width and height)
     pub fn new(size: f64) -> Self {
         TileSettings {
             size: size,
@@ -50,8 +59,11 @@ impl TileSettings {
         }
     }
 
-    /// Sets the glyph cache for the TileRenderer based on an existing cache.
-    /// Moves the reference to this TileRenderer.
+    /// Sets the glyph cache for the `TileRenderer` based on an existing cache.
+    /// Moves the reference to this `TileRenderer` and can therefore not be shared.  
+    ///
+    /// `Glyphs` are usually created with `Glyphs::new(font, factory,
+    /// TextureSettings::new()).unwrap()` with `PistonWindow`.
     pub fn with_glyphs(mut self, glyphs: Glyphs) -> TileSettings {
         self.glyphs = Some(RefCell::new(glyphs));
         self
@@ -65,12 +77,18 @@ impl TileSettings {
     }
 
     /// Creates a new glyph cache based on a given font file.
+    /// * `path`:    Path to the font file.
+    /// * `factory`: GfxFactory for creating resources.  
+    ///            Usually created with `window.factory.clone();` where `window`
+    ///            is a `PistonWindow`.
     pub fn with_font(mut self, path: &Path, factory: GfxFactory) -> TileSettings {
         self.glyphs = Some(RefCell::new(Glyphs::new(path, factory, TextureSettings::new()).unwrap()));
         self
     }
 
     /// Constructs a TileRenderer based on the given settings.
+    ///
+    /// Panics, if no `GlyphCache` has been passed via the builder methods.
     pub fn build(self) -> TileRenderer {
         TileRenderer {
             size: self.size,
@@ -83,17 +101,27 @@ impl TileSettings {
 
 /// Actual tile renderer
 pub struct TileRenderer {
-    // size of a single tile
+    /// The size of a single tile
     size: f64,
-    // glyph cache for font
+    /// The glyph cache for font
     glyphs: RefCell<Glyphs>,
-    // function that determines the drawn colors
+    /// A function that determines the drawn colors
     color_mapping: fn(u16) -> (Color, Color),
 }
 
 impl TileRenderer {
+    /// Draws a tile from the game board on the screen.
+    ///
+    /// Use the transformation matrix of c for positioning and rotation.
+    ///
+    /// * `tile_value`: Number that is displayed on the tile. This value  
+    ///                 determines the color of the rendered tile.
+    /// * `c`:          Graphics context for drawing.
+    /// * `g`:          Graphics module for drawing.
     pub fn draw_tile<G>(&self, tile_value: u16, c: &Context, g: &mut G)
-        where G: Graphics<Texture=<Glyphs as CharacterCache>::Texture>{
+        where G: Graphics<Texture = <Glyphs as CharacterCache>::Texture> {
+
+        // draw tile
         Rectangle::new_round((self.color_mapping)(tile_value).0, 5.0)
             .draw(rectangle::square(0.0, 0.0, self.size), &c.draw_state, c.transform, g);
         

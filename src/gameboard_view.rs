@@ -57,7 +57,7 @@ impl GameboardView {
     pub fn new(settings: GameboardViewSettings, glyphs: Glyphs) -> GameboardView {
         GameboardView {
             settings: settings,
-            tile_renderer: TileSettings::new(80.0).with_glyphs(glyphs).build(),
+            tile_renderer: TileSettings::new(90.0).with_glyphs(glyphs).build(),
         }
     }
 
