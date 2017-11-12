@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Jibbow/rust-2048.svg?branch=master)](https://travis-ci.org/Jibbow/rust-2048)
+
 2048 in Rust
 ============
 
