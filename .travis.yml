@@ -13,3 +13,8 @@ matrix:
 script:
   - cargo build --verbose --all
   - cargo test --verbose --all
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
