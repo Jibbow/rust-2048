@@ -31,23 +31,23 @@ fn main() {
 
     let assets = find_folder::Search::ParentsThenKids(3, 3)
         .for_folder("assets").unwrap();
-    let ref font = assets.join("FiraSans-Regular.ttf");
-    let factory = window.factory.clone();
-    let glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
+    let mut glyphs = window.load_font(assets.join("FiraSans-Regular.ttf")).unwrap();
 
     let gameboard = Gameboard::new();
     let mut gameboard_controller = GameboardController::new(gameboard);
     let gameboard_view_settings = GameboardViewSettings::new();
-    let gameboard_view = GameboardView::new(gameboard_view_settings, glyphs);
+    let gameboard_view = GameboardView::new(gameboard_view_settings);
 
     window.set_lazy(true);
     while let Some(e) = window.next() {
         gameboard_controller.event(&e);
-        if let Some(args) = e.render_args() {
-            window.draw_2d(&e, |c, g| {
+        if let Some(_args) = e.render_args() {
+            window.draw_2d(&e, |c, g, d| {
                 clear([0.0; 4], g);
 
-                gameboard_view.draw(&gameboard_controller, &c, g);
+                gameboard_view.draw(&gameboard_controller, &c, g, &mut glyphs);
+
+                glyphs.factory.encoder.flush(d);
             });
         }
     }

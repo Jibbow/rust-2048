@@ -54,19 +54,17 @@ pub struct GameboardView {
 
 impl GameboardView {
     /// Creates a new gameboard view.
-    pub fn new(settings: GameboardViewSettings, glyphs: Glyphs) -> GameboardView {
+    pub fn new(settings: GameboardViewSettings) -> GameboardView {
         GameboardView {
             settings: settings,
-            tile_renderer: TileSettings::new(90.0).with_glyphs(glyphs).build(),
+            tile_renderer: TileSettings::new(90.0).build(),
         }
     }
 
     /// Draw gameboard.
-    pub fn draw<G>(&self, controller: &GameboardController, c: &Context, g: &mut G) 
+    pub fn draw<G>(&self, controller: &GameboardController, c: &Context, g: &mut G, glyphs: &mut Glyphs) 
         where G: Graphics<Texture=<Glyphs as CharacterCache>::Texture>{
 
-        use graphics::{Rectangle};
-        
         let ref settings = self.settings;
         let board_rect = [
             settings.position[0], settings.position[1],
@@ -80,11 +78,10 @@ impl GameboardView {
         let gameboardsize = controller.gameboard.cells.len();
         for x in 0..gameboardsize {
             for y in 0..gameboardsize {
-                let size = settings.size / gameboardsize as f64 - 8.0;
                 let pos_x = x as f64 * settings.size / gameboardsize as f64 + 4.0;
                 let pos_y = y as f64 * settings.size / gameboardsize as f64 + 4.0;
 
-                self.tile_renderer.draw_tile(controller.gameboard.cells[x][y], &c.trans(pos_x, pos_y), g);
+                self.tile_renderer.draw_tile(controller.gameboard.cells[x][y], &c.trans(pos_x, pos_y), g, glyphs);
             }
         }
         
